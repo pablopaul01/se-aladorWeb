@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/auth-form";
 import { Brand } from "@/components/brand";
@@ -5,7 +6,11 @@ import { BookOpen, Bookmark, Leaf, ArrowUpRight } from "lucide-react";
 import { getSupabaseConfig } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function Login() {
+export default function Login() {
+  return <Suspense fallback={<main className="grid min-h-dvh place-items-center"><p className="text-sm text-muted-foreground">Preparing your reading corner…</p></main>}><LoginContent /></Suspense>;
+}
+
+async function LoginContent() {
   const configured = Boolean(getSupabaseConfig());
   if (configured) {
     const supabase = await createClient();

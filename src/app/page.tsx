@@ -1,11 +1,14 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Library } from "@/components/library";
 import { getSupabaseConfig } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 
-export const dynamic = "force-dynamic";
+export default function Home() {
+  return <Suspense fallback={<main className="mx-auto max-w-6xl px-6 py-16"><p className="text-sm text-muted-foreground">Opening your reading corner…</p></main>}><HomeContent /></Suspense>;
+}
 
-export default async function Home() {
+async function HomeContent() {
   if (!getSupabaseConfig()) {
     return <Library books={[]} email={null} configured={false} />;
   }
