@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { ArrowRight, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { authenticate } from "@/app/login/actions";
 import { initialActionState } from "@/lib/action-state";
+import { submitWithoutReset } from "@/lib/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,7 +35,7 @@ function CredentialFields({ mode, configured }: { mode: "login" | "signup"; conf
   const [visible, setVisible] = useState(false);
   const signup = mode === "signup";
   return (
-    <form action={action} className="space-y-5">
+    <form onSubmit={submitWithoutReset(action)} className="space-y-5">
       <fieldset disabled={pending} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="email">{t("Email address")}</Label>

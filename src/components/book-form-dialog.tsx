@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { initialActionState } from "@/lib/action-state";
+import { submitWithoutReset } from "@/lib/form";
 import type { Book } from "@/lib/supabase/types";
 import { toast } from "sonner";
 
@@ -26,7 +27,7 @@ function BookForm({ book, onOpenChange }: { book: Book | null; onOpenChange: (op
   return (
     <DialogContent className="max-w-md">
       <DialogHeader><DialogTitle>{book ? t("Edit book details") : t("Add a book")}</DialogTitle><DialogDescription>{t("Keep the details you need to find your place again.")}</DialogDescription></DialogHeader>
-      <form action={formAction} className="grid gap-4">
+      <form onSubmit={submitWithoutReset(formAction)} className="grid gap-4">
         <div className="grid gap-2"><Label htmlFor="book-title">{t("Title")}</Label><Input id="book-title" name="title" required maxLength={200} defaultValue={book?.title ?? ""} aria-invalid={Boolean(state.fields?.title?.length)} aria-describedby="book-title-error"/><FieldError id="book-title-error" errors={state.fields?.title}/></div>
         <div className="grid gap-2"><Label htmlFor="book-author">{t("Author")}</Label><Input id="book-author" name="author" maxLength={200} defaultValue={book?.author ?? ""} aria-invalid={Boolean(state.fields?.author?.length)} aria-describedby="book-author-error"/><FieldError id="book-author-error" errors={state.fields?.author}/></div>
         <div className="grid gap-2"><Label htmlFor="book-pages">{t("Total pages")} <span className="text-muted-foreground">{t("(optional)")}</span></Label><Input id="book-pages" name="total_pages" type="number" min={1} max={1000000} defaultValue={book?.total_pages ?? ""} aria-invalid={Boolean(state.fields?.total_pages?.length)} aria-describedby="book-pages-error"/><FieldError id="book-pages-error" errors={state.fields?.total_pages}/></div>
