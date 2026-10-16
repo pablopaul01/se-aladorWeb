@@ -22,8 +22,8 @@ export function LoginScreen({ configured }: { configured: boolean }) {
         </div>
         <p className="text-xs text-muted-foreground">{t("Less scrolling. More stories.")} <ArrowUpRight className="ml-1 inline size-3" /></p>
       </section>
-      <section className="flex min-h-dvh flex-col px-6 py-8 sm:px-12">
-        <div className="mb-12 flex items-center justify-between gap-3"><Brand className="lg:hidden" /><LanguageSelector /></div>
+      <section className="flex min-h-dvh flex-col px-5 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-12">
+        <div className="mb-12 flex items-center justify-between gap-3"><Brand className="lg:hidden" /><LanguageSelector compact /></div>
         <div className="m-auto w-full max-w-sm py-8"><AuthForm configured={configured} /></div>
         <p className="mt-8 text-center text-xs text-muted-foreground">{t("Your books. Your pace. Your little reading corner.")}</p>
       </section>

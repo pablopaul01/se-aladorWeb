@@ -32,7 +32,7 @@ function BookForm({ book, onOpenChange }: { book: Book | null; onOpenChange: (op
         <div className="grid gap-2"><Label htmlFor="book-pages">{t("Total pages")} <span className="text-muted-foreground">{t("(optional)")}</span></Label><Input id="book-pages" name="total_pages" type="number" min={1} max={1000000} defaultValue={book?.total_pages ?? ""} aria-invalid={Boolean(state.fields?.total_pages?.length)} aria-describedby="book-pages-error"/><FieldError id="book-pages-error" errors={state.fields?.total_pages}/></div>
         {book && <><input type="hidden" name="current_page" value={book.current_page ?? ""}/><input type="hidden" name="current_section" value={book.current_section ?? ""}/><input type="hidden" name="note" value={book.note ?? ""}/></>}
         <FormFeedback state={state}/>
-        <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t("Cancel")}</Button><Button type="submit" disabled={pending}>{pending ? t("Saving…") : book ? t("Save changes") : t("Add to library")}</Button></div>
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end"><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t("Cancel")}</Button><Button type="submit" disabled={pending}>{pending ? t("Saving…") : book ? t("Save changes") : t("Add to library")}</Button></div>
       </form>
     </DialogContent>
   );

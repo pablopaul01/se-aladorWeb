@@ -52,11 +52,11 @@ export function useI18n() {
   return context;
 }
 
-export function LanguageSelector() {
+export function LanguageSelector({ compact = false }: { compact?: boolean }) {
   const { locale, pending, t, changeLocale } = useI18n();
   return <label className="flex items-center gap-2 px-2 py-2 text-sm">
-    <span>{t("Language")}</span>
-    <select aria-label={t("Language")} value={locale} disabled={pending} onChange={(event) => void changeLocale(event.target.value as Locale)} className="min-w-0 rounded-md border bg-background px-2 py-1 text-foreground">
+    <span className={compact ? "sr-only sm:not-sr-only" : undefined}>{t("Language")}</span>
+    <select aria-label={t("Language")} value={locale} disabled={pending} onChange={(event) => void changeLocale(event.target.value as Locale)} className="min-w-0 rounded-md border bg-background px-2 py-1 text-base text-foreground pointer-coarse:min-h-10 md:text-sm">
       <option value="es" lang="es">Español</option><option value="en" lang="en">English</option>
     </select>
     {pending && <span role="status" className="sr-only">{t("Saving language…")}</span>}

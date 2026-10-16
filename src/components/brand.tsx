@@ -9,8 +9,8 @@ export function Brand({ className }: { className?: string }) {
   const { t } = useI18n();
   return (
     <Link href="/" className={cn("inline-flex items-center gap-2.5", className)} aria-label={t("Señalador home")}>
-      <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-white"><Bookmark className="size-5" strokeWidth={1.6} /></span>
-      <span className="editorial text-[27px] font-semibold">señalador<span className="text-primary">.</span></span>
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-primary text-white sm:size-9"><Bookmark className="size-[18px] sm:size-5" strokeWidth={1.6} /></span>
+      <span className="editorial text-[22px] font-semibold sm:text-[27px]">señalador<span className="text-primary">.</span></span>
     </Link>
   );
 }
