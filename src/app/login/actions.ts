@@ -1,5 +1,7 @@
 "use server";
 
+import { cookies } from "next/headers";
+import { localeCookie, normalizeLocale } from "@/lib/i18n/core";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -22,7 +24,7 @@ export async function authenticate(mode: "login" | "signup", _previous: ActionSt
     const supabase = await createClient();
     const credentials = { email: parsed.data.email, password: parsed.data.password };
     const { data, error } = mode === "signup"
-      ? await supabase.auth.signUp(credentials)
+      ? await supabase.auth.signUp({ ...credentials, options: { data: { locale: normalizeLocale((await cookies()).get(localeCookie)?.value) } } })
       : await supabase.auth.signInWithPassword(credentials);
 
     if (error) {

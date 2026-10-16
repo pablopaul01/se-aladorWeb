@@ -58,7 +58,7 @@ export async function saveLocation(id: string, _previous: ActionState, form: For
     if (readError) return failed;
     if (!book) return missing;
     if (!isPageWithinBook(parsed.data.current_page, book.total_pages)) {
-      return { success: false, message: "Your page is beyond the end of this book.", fields: { current_page: [`Enter a page between 1 and ${book.total_pages}.`] } };
+      return { success: false, message: "Enter a page between 1 and {total}.", params: { total: book.total_pages! }, fields: { current_page: ["Your page is beyond the end of this book."] } };
     }
     const { data, error } = await supabase.from("books").update(parsed.data).eq("id", id).eq("user_id", user.id).select("id").maybeSingle();
     if (error) return failed;

@@ -5,7 +5,7 @@ import { getSupabaseConfig } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 
 export default function Home() {
-  return <Suspense fallback={<main className="mx-auto max-w-6xl px-6 py-16"><p className="text-sm text-muted-foreground">Opening your reading corner…</p></main>}><HomeContent /></Suspense>;
+  return <Suspense fallback={null}><HomeContent /></Suspense>;
 }
 
 async function HomeContent() {

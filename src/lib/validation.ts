@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-const optionalText = (max: number) => z.string().trim().max(max).transform((value) => value || null);
+const optionalText = (max: number) => z.string().trim().max(max, `Use no more than ${max} characters.`).transform((value) => value || null);
 const page = z.preprocess(
   (value) => value === "" || value === null || value === undefined ? null : value,
-  z.union([z.null(), z.coerce.number().int("Use a whole page number.").min(1, "Pages start at 1.").max(1_000_000, "The page number is too large.")]),
+  z.union([z.null(), z.coerce.number({ error: "Use a whole page number." }).int("Use a whole page number.").min(1, "Pages start at 1.").max(1_000_000, "The page number is too large.")]),
 );
 
 export const credentialsSchema = z.object({
-  email: z.email("Enter a valid email address.").max(254).transform((value) => value.toLowerCase()),
+  email: z.email("Enter a valid email address.").max(254, "Enter a valid email address.").transform((value) => value.toLowerCase()),
   password: z.string().min(1, "Enter your password.").max(128, "Use no more than 128 characters."),
 });
 

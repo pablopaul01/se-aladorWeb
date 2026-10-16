@@ -1,3 +1,5 @@
+"use client";
+import { useI18n } from "@/components/locale-provider";
 import type { Book } from "@/lib/supabase/types";
 
 const palettes = [
@@ -6,6 +8,7 @@ const palettes = [
 ];
 
 export function BookCover({ book, className = "" }: { book: Pick<Book, "title" | "author">; className?: string }) {
+  const { t } = useI18n();
   const hash = Array.from(book.title).reduce((value, char) => (value * 31 + char.charCodeAt(0)) >>> 0, 7);
   const [background, ribbon] = palettes[hash % palettes.length];
 
@@ -18,7 +21,7 @@ export function BookCover({ book, className = "" }: { book: Pick<Book, "title" |
       <span className="absolute inset-y-0 left-2 w-px bg-white/20" />
       <span className="absolute top-0 right-4 h-1/3 w-2" style={{ backgroundColor: ribbon }} />
       <span className="line-clamp-4 font-heading text-[clamp(0.8rem,2vw,1.1rem)] leading-tight font-semibold">{book.title}</span>
-      <span className="absolute inset-x-3 bottom-3 truncate text-[10px] tracking-wide text-white/75">{book.author || "A story to remember"}</span>
+      <span className="absolute inset-x-3 bottom-3 truncate text-[10px] tracking-wide text-white/75">{book.author || t("A story to remember")}</span>
     </div>
   );
 }
