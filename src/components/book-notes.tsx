@@ -37,7 +37,7 @@ export function BookNotes({ bookId, notes, loadError }: { bookId: string; notes:
     {!loadError && !notes.length && editing === null ? <p className="text-sm text-muted-foreground">{t("No notes yet. Save a thought without changing your progress.")}</p> : null}
     <ul className="grid gap-3">
       {notes.map((note) => <li key={note.id} className="min-w-0 rounded-lg bg-muted p-3">
-        <p className="break-words text-xs font-medium text-muted-foreground">{note.reference_type === "pending" ? t("Location pending") : note.reference_type === "reference" ? note.reference : note.reference_type === "range" ? t("Pages {start}–{end}", { start: note.page_start!, end: note.page_end! }) : t("Page {page}", { page: note.page_start! })}</p>
+        <p className="break-words text-xs font-medium text-muted-foreground">{note.reference_type === "pending" ? t("Location pending") : [note.reference_type === "range" ? t("Pages {start}–{end}", { start: note.page_start!, end: note.page_end! }) : note.reference_type === "page" ? t("Page {page}", { page: note.page_start! }) : null, note.reference].filter(Boolean).join(" · ")}</p>
         <p className="mt-1 whitespace-pre-wrap break-words text-sm">{note.content}</p>
         <div className="mt-2 flex flex-wrap gap-2">
           <Button type="button" size="sm" variant="ghost" disabled={editing !== null || pending} onClick={() => setEditing(note)}>{t("Edit note")}</Button>
@@ -50,7 +50,7 @@ export function BookNotes({ bookId, notes, loadError }: { bookId: string; notes:
 
 function NoteForm({ bookId, note, onClose }: { bookId: string; note: BookNote | null; onClose: () => void }) {
   const { t } = useI18n();
-  const [type, setType] = useState<"" | "page" | "range" | "reference">(note?.reference_type === "pending" ? "" : note?.reference_type ?? "");
+  const [type, setType] = useState<"page" | "range" | "reference">(note?.reference_type === "pending" ? "reference" : note?.reference_type ?? "reference");
   const [state, formAction, pending] = useActionState(saveNote.bind(null, bookId, note?.id ?? null), initialActionState);
   useEffect(() => {
     if (state.success) { toast.success(t(state.message)); onClose(); }
@@ -64,12 +64,11 @@ function NoteForm({ bookId, note, onClose }: { bookId: string; note: BookNote | 
       <FieldError id="note-content-error" errors={state.fields?.content}/>
     </div>
     <div className="grid gap-2">
-      <Label htmlFor="note-location-type">{t("Location type")}</Label>
-      <select id="note-location-type" name="reference_type" required value={type} onChange={(event) => setType(event.target.value as typeof type)} disabled={pending} className="h-9 w-full min-w-0 rounded-md border bg-background px-3 text-sm" aria-invalid={Boolean(state.fields?.reference_type?.length)} aria-describedby="note-location-type-error">
-        <option value="" disabled>{t("Choose a location")}</option>
+      <Label htmlFor="note-location-type">{t("Page location")}</Label>
+      <select id="note-location-type" name="reference_type" value={type} onChange={(event) => setType(event.target.value as typeof type)} disabled={pending} className="h-9 w-full min-w-0 rounded-md border bg-background px-3 text-sm" aria-invalid={Boolean(state.fields?.reference_type?.length)} aria-describedby="note-location-type-error note-location-help">
+        <option value="reference">{t("No page or range")}</option>
         <option value="page">{t("Page")}</option>
         <option value="range">{t("Page range")}</option>
-        <option value="reference">{t("Reference")}</option>
       </select>
       <FieldError id="note-location-type-error" errors={state.fields?.reference_type}/>
     </div>
@@ -85,11 +84,12 @@ function NoteForm({ bookId, note, onClose }: { bookId: string; note: BookNote | 
         <FieldError id="note-page-end-error" errors={state.fields?.page_end}/>
       </div> : null}
     </div> : null}
-    {type === "reference" ? <div className="grid gap-2">
-      <Label htmlFor="note-reference">{t("Reference")}</Label>
-      <Input id="note-reference" name="reference" required maxLength={200} defaultValue={note?.reference ?? ""} placeholder={t("Chapter 4 or John 1, 4-5")} aria-invalid={Boolean(state.fields?.reference?.length)} aria-describedby="note-reference-error"/>
+    <div className="grid gap-2">
+      <Label htmlFor="note-reference">{t("Section or reference")}</Label>
+      <Input id="note-reference" name="reference" required={type === "reference"} maxLength={200} defaultValue={note?.reference ?? ""} placeholder={t("Chapter 4 or John 1, 4-5")} aria-invalid={Boolean(state.fields?.reference?.length)} aria-describedby="note-reference-error note-location-help"/>
       <FieldError id="note-reference-error" errors={state.fields?.reference}/>
-    </div> : null}
+    </div>
+    <p id="note-location-help" className="text-xs text-muted-foreground">{t("Add a page, a page range, or a section/reference. You can combine pages with a section/reference.")}</p>
     <FormFeedback state={state}/>
     <div className="flex flex-wrap justify-end gap-2">
       <Button type="button" variant="outline" disabled={pending} onClick={onClose}>{t("Cancel")}</Button>

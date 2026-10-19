@@ -21,9 +21,8 @@ test("multiple notes are independent from progress and legacy notes require a lo
   await notes.getByRole("button", { name: "Editar nota", exact: true }).click();
   await expect(page.getByLabel("Nota", { exact: true })).toHaveValue("Original note");
   await page.getByRole("button", { name: "Guardar nota", exact: true }).click();
-  await expect(page.getByLabel("Tipo de ubicación")).toHaveValue("");
-  await page.getByLabel("Tipo de ubicación").selectOption("reference");
-  await page.getByLabel("Referencia", { exact: true }).fill("Juan 1, 4-5");
+  await expect(page.getByLabel("Ubicación por páginas")).toHaveValue("reference");
+  await page.getByLabel("Sección o referencia", { exact: true }).fill("Juan 1, 4-5");
   await page.getByRole("button", { name: "Guardar nota", exact: true }).click();
   await expect(notes).toContainText("Juan 1, 4-5");
   await expect(notes).not.toContainText("Ubicación pendiente");
@@ -31,23 +30,41 @@ test("multiple notes are independent from progress and legacy notes require a lo
 
   await notes.getByRole("button", { name: "Añadir nota", exact: true }).click();
   await page.getByLabel("Nota", { exact: true }).fill("Range thought");
-  await page.getByLabel("Tipo de ubicación").selectOption("range");
+  await page.getByLabel("Ubicación por páginas").selectOption("range");
   await page.getByLabel("Página inicial").fill("42");
   await page.getByLabel("Página final").fill("40");
   await page.getByRole("button", { name: "Guardar nota", exact: true }).click();
   await expect(page.getByText("La página final debe ser mayor que la página inicial.")).toBeVisible();
   await expect(page.getByLabel("Nota", { exact: true })).toHaveValue("Range thought");
   await page.getByLabel("Página final").fill("48");
+  await page.getByLabel("Sección o referencia", { exact: true }).fill("Range section");
   await page.getByRole("button", { name: "Guardar nota", exact: true }).click();
   await expect(notes).toContainText("Páginas 42–48");
+  await expect(notes).toContainText("Range section");
 
   await notes.getByRole("button", { name: "Añadir nota", exact: true }).click();
   await page.getByLabel("Nota", { exact: true }).fill("Page thought");
-  await page.getByLabel("Tipo de ubicación").selectOption("page");
-  await page.getByLabel("Página", { exact: true }).fill("60");
+  await page.getByLabel("Ubicación por páginas").selectOption("page");
+  await page.getByLabel("Página", { exact: true }).fill("114");
+  await page.getByLabel("Sección o referencia", { exact: true }).fill("Capítulo 4");
   await page.getByRole("button", { name: "Guardar nota", exact: true }).click();
   await expect(notes.getByRole("listitem")).toHaveCount(3);
-  await expect(notes).toContainText("Página 60");
+  const pageNote = notes.getByRole("listitem").filter({ hasText: "Page thought" });
+  await expect(pageNote).toContainText("Página 114 · Capítulo 4");
+  await pageNote.getByRole("button", { name: "Editar nota", exact: true }).click();
+  await expect(page.getByLabel("Página", { exact: true })).toHaveValue("114");
+  await expect(page.getByLabel("Sección o referencia", { exact: true })).toHaveValue("Capítulo 4");
+  await page.getByLabel("Ubicación por páginas").selectOption("range");
+  await expect(page.getByLabel("Sección o referencia", { exact: true })).toHaveValue("Capítulo 4");
+  await page.getByLabel("Página final").fill("118");
+  await page.getByRole("button", { name: "Guardar nota", exact: true }).click();
+  await expect(pageNote).toContainText("Páginas 114–118 · Capítulo 4");
+  // Removing the section is allowed while a valid numeric location remains.
+  await pageNote.getByRole("button", { name: "Editar nota", exact: true }).click();
+  await page.getByLabel("Sección o referencia", { exact: true }).fill("");
+  await page.getByRole("button", { name: "Guardar nota", exact: true }).click();
+  await expect(pageNote).toContainText("Páginas 114–118");
+  await expect(pageNote).not.toContainText("Capítulo 4");
   await expect(page.getByRole("dialog")).toContainText("Página 12 de 300");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 

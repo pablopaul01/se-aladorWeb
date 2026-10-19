@@ -49,7 +49,6 @@ export const noteSchema = z.object({
   ...value,
   page_start: value.reference_type === "reference" ? null : value.page_start,
   page_end: value.reference_type === "range" ? value.page_end : null,
-  reference: value.reference_type === "reference" ? value.reference : null,
 }));
 
 export const bookIdSchema = z.uuid();

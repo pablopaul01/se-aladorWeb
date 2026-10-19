@@ -33,6 +33,18 @@ test("new or edited notes cannot be unlocated, pending, empty, or invalid", () =
   for (const input of invalid) assert.equal(noteSchema.safeParse(input).success, false, JSON.stringify(input));
 });
 
+test("a page or range can be combined with a section without losing either", () => {
+  assert.deepEqual(noteSchema.parse({ content, reference_type: "page", page_start: "114", reference: " Capítulo 4 " }), {
+    content, reference_type: "page", page_start: 114, page_end: null, reference: "Capítulo 4",
+  });
+  assert.deepEqual(noteSchema.parse({ content, reference_type: "range", page_start: "114", page_end: "120", reference: "Juan 1, 4-5" }), {
+    content, reference_type: "range", page_start: 114, page_end: 120, reference: "Juan 1, 4-5",
+  });
+  assert.deepEqual(noteSchema.parse({ content, reference_type: "page", page_start: "114", reference: " \n " }), {
+    content, reference_type: "page", page_start: 114, page_end: null, reference: null,
+  });
+});
+
 test("note payloads strip bookmark fields and normalize unused reference fields", () => {
   assert.deepEqual(noteSchema.parse({ content: ` ${content} `, reference_type: "reference", reference: " Juan 1, 4-5 ", current_page: "100", current_section: "New chapter", user_id: "other-user", page_start: "12", page_end: "15" }), {
     content, reference_type: "reference", reference: "Juan 1, 4-5", page_start: null, page_end: null,

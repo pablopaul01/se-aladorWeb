@@ -6,8 +6,10 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 Before running this version against an existing Supabase database, apply
 `supabase/migrations/20261019000000_create_book_notes.sql` using your migration
-workflow or the Supabase SQL editor. For a new database, apply all files in
-`supabase/migrations/` in filename order.
+workflow or the Supabase SQL editor, followed by
+`supabase/migrations/20261019010000_allow_combined_note_locations.sql`. If the
+first migration is already applied, run only the second one. For a new database,
+apply all files in `supabase/migrations/` in filename order.
 
 Back up the database first and coordinate the migration with deployment: it moves
 existing `books.note` values into `book_notes` and removes the old column, so older
@@ -15,9 +17,11 @@ application versions are not compatible with the migrated schema.
 
 Open a book and use **Add note** to create multiple notes without changing reading
 progress. Every new or edited note requires a page, a range whose end is greater
-than its start, or a nonempty free-text reference. Historical notes are preserved
-as **Location pending** until you assign a location when editing them. Deleting a
-book also deletes its notes.
+than its start, or a nonempty free-text section/reference. A page or range can
+also be combined with a section/reference (for example, page 114 and Chapter 4).
+Selecting a page excludes a page range, but does not exclude a text reference.
+Historical notes are preserved as **Location pending** until you assign a
+location when editing them. Deleting a book also deletes its notes.
 
 Run validation and browser tests with:
 

@@ -1,4 +1,8 @@
 export const es = {
+  "Page location": "Ubicación por páginas",
+  "No page or range": "Sin página ni rango",
+  "Section or reference": "Sección o referencia",
+  "Add a page, a page range, or a section/reference. You can combine pages with a section/reference.": "Añade una página, un rango de páginas o una sección/referencia. Puedes combinar páginas con una sección/referencia.",
   "Notes": "Notas",
   "Add note": "Añadir nota",
   "Edit note": "Editar nota",
