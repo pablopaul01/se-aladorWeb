@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { initialActionState } from "@/lib/action-state";
 import { submitWithoutReset } from "@/lib/form";
 import type { Book } from "@/lib/supabase/types";
@@ -29,7 +28,6 @@ function LocationForm({ book, onOpenChange }: { book: Book; onOpenChange: (open:
       <form onSubmit={submitWithoutReset(formAction)} className="grid gap-4">
         <div className="grid gap-2"><Label htmlFor="current-page">{t("Page")} <span className="text-muted-foreground">{t("(optional)")}</span></Label><Input id="current-page" name="current_page" type="number" min={1} max={book.total_pages ?? 1000000} defaultValue={book.current_page ?? ""} aria-invalid={Boolean(state.fields?.current_page?.length)} aria-describedby="current-page-error"/><FieldError id="current-page-error" errors={state.fields?.current_page}/></div>
         <div className="grid gap-2"><Label htmlFor="current-section">{t("Chapter or section")}</Label><Input id="current-section" name="current_section" maxLength={200} defaultValue={book.current_section ?? ""} aria-invalid={Boolean(state.fields?.current_section?.length)} aria-describedby="current-section-error"/><FieldError id="current-section-error" errors={state.fields?.current_section}/></div>
-        <div className="grid gap-2"><Label htmlFor="reading-note">{t("Note")}</Label><Textarea id="reading-note" name="note" maxLength={2000} defaultValue={book.note ?? ""} placeholder={t("A thought to remember…")} aria-invalid={Boolean(state.fields?.note?.length)} aria-describedby="reading-note-error"/><FieldError id="reading-note-error" errors={state.fields?.note}/></div>
         <FormFeedback state={state}/><div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end"><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t("Cancel")}</Button><Button type="submit" disabled={pending}>{pending ? t("Saving…") : t("Save my place")}</Button></div>
       </form>
     </DialogContent>

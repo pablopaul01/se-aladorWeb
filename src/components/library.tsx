@@ -14,7 +14,7 @@ import { SetupNotice } from "@/components/setup-notice";
 import { UserMenu } from "@/components/user-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { Book } from "@/lib/supabase/types";
+import type { Book, BookNote } from "@/lib/supabase/types";
 import { toast } from "sonner";
 import { cn } from "cn";
 
@@ -31,7 +31,9 @@ function progressFor(book: Book) {
   return Math.min(100, Math.round((book.current_page / book.total_pages) * 100));
 }
 
-export function Library({ books, email, configured, loadError = false }: { books: Book[]; email: string | null; configured: boolean; loadError?: boolean }) {
+const emptyNotes: BookNote[] = [];
+
+export function Library({ books, notes = emptyNotes, notesLoadError = false, email, configured, loadError = false }: { books: Book[]; notes?: BookNote[]; notesLoadError?: boolean; email: string | null; configured: boolean; loadError?: boolean }) {
   const { t, locale } = useI18n();
   const [view, setView] = useState<View>("Library");
   const [filter, setFilter] = useState<Filter>("All books");
@@ -47,12 +49,21 @@ export function Library({ books, email, configured, loadError = false }: { books
   const selected = useMemo(() => books.find((book) => book.id === detailId) ?? null, [books, detailId]);
   const locationBook = useMemo(() => books.find((book) => book.id === locationId) ?? null, [books, locationId]);
   const editingBook = useMemo(() => books.find((book) => book.id === formId) ?? null, [books, formId]);
+  const notesByBook = useMemo(() => {
+    const grouped = new Map<string, BookNote[]>();
+    for (const note of notes) {
+      const group = grouped.get(note.book_id);
+      if (group) group.push(note);
+      else grouped.set(note.book_id, [note]);
+    }
+    return grouped;
+  }, [notes]);
   const visibleBooks = useMemo(() => books.filter((book) => {
     if (view === "Library" && filter === "Reading" && book.status !== "reading") return false;
     if (view === "Library" && filter === "Finished" && book.status !== "finished") return false;
     const needle = query.trim().toLocaleLowerCase();
-    return !needle || [book.title, book.author, book.current_section, book.note].some((value) => value?.toLocaleLowerCase().includes(needle));
-  }), [books, filter, query, view]);
+    return !needle || [book.title, book.author, book.current_section, ...(notesByBook.get(book.id) ?? []).flatMap((note) => [note.content, note.reference, note.page_start?.toString(), note.page_end?.toString()])].some((value) => value?.toLocaleLowerCase().includes(needle));
+  }), [books, notesByBook, filter, query, view]);
   const reading = books.filter((book) => book.status === "reading");
   const finished = books.filter((book) => book.status === "finished");
   const average = books.length ? Math.round(books.reduce((sum, book) => sum + progressFor(book), 0) / books.length) : 0;
@@ -102,7 +113,7 @@ export function Library({ books, email, configured, loadError = false }: { books
         {view === "Profile" && <section><PageHeading eyebrow={t("Your account")} title={t("A reader, always.")}/><div className="mt-6 max-w-lg rounded-2xl border border-border/70 bg-card p-5 sm:mt-8 sm:p-6"><p className="text-sm text-muted-foreground">{t("Signed in as")}</p><p className="mt-1 break-all font-medium">{email || t("Guest reader")}</p><div className="mt-6"><UserMenu email={email}/></div></div></section>}
       </main>
       <nav aria-label={t("Main navigation")} className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 gap-1 border-t border-border/70 bg-card/95 px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">{navigation.map(({ name, icon: Icon }) => <NavButton key={name} name={name} current={view === name} icon={<Icon className="size-5"/>} onClick={() => setView(name)} mobile/>)}</nav>
-      <BookDetailDialog book={selected} progress={selected ? progressFor(selected) : 0} open={detailOpen} onOpenChange={setDetailOpen} onEdit={() => selected && openForm(selected.id)} onLocation={() => selected && openLocation(selected)} onStatus={updateStatus} onDelete={removeBook}/>
+      <BookDetailDialog book={selected} notes={selected ? notesByBook.get(selected.id) ?? emptyNotes : emptyNotes} notesLoadError={notesLoadError} progress={selected ? progressFor(selected) : 0} open={detailOpen} onOpenChange={setDetailOpen} onEdit={() => selected && openForm(selected.id)} onLocation={() => selected && openLocation(selected)} onStatus={updateStatus} onDelete={removeBook}/>
       <BookFormDialog book={editingBook} open={formOpen} onOpenChange={setFormOpen}/>
       <LocationDialog book={locationBook} open={locationOpen} onOpenChange={setLocationOpen}/>
       {pending && <span className="sr-only" role="status">{t("Saving changes…")}</span>}

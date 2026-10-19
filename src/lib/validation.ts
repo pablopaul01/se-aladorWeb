@@ -28,8 +28,29 @@ export const bookDetailsSchema = z.object({
 export const locationSchema = z.object({
   current_page: page,
   current_section: optionalText(200),
-  note: optionalText(2000),
 });
+
+export const noteSchema = z.object({
+  content: z.string().trim().min(1, "Enter a note.").max(2000, "Use no more than 2000 characters."),
+  reference_type: z.enum(["page", "range", "reference"], { error: "Choose a note location type." }),
+  page_start: page,
+  page_end: page,
+  reference: optionalText(200).prefault(""),
+}).superRefine((value, context) => {
+  if (value.reference_type === "reference") {
+    if (!value.reference) context.addIssue({ code: "custom", path: ["reference"], message: "Enter a reference." });
+  } else {
+    if (value.page_start === null) context.addIssue({ code: "custom", path: ["page_start"], message: "Enter a page." });
+    if (value.reference_type === "range" && (value.page_end === null || (value.page_start !== null && value.page_end <= value.page_start))) {
+      context.addIssue({ code: "custom", path: ["page_end"], message: "The end page must be greater than the start page." });
+    }
+  }
+}).transform((value) => ({
+  ...value,
+  page_start: value.reference_type === "reference" ? null : value.page_start,
+  page_end: value.reference_type === "range" ? value.page_end : null,
+  reference: value.reference_type === "reference" ? value.reference : null,
+}));
 
 export const bookIdSchema = z.uuid();
 export const statusSchema = z.enum(["reading", "finished"]);

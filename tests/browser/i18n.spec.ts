@@ -63,10 +63,12 @@ test("mobile user menu switches language and dialogs translate without modifying
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Open The Original Title" }).click();
   await expect(page.getByRole("dialog")).toContainText("Original Author");
+  await expect(page.getByRole("dialog")).toContainText("Original note");
+  await expect(page.getByRole("dialog")).toContainText("Location pending");
   await page.getByRole("button", { name: "Save my place" }).click();
   await expect(page.getByRole("dialog")).toContainText("Pick up where you left off in The Original Title.");
   await expect(page.getByLabel("Chapter or section")).toHaveValue("Chapter One");
-  await expect(page.getByLabel("Note", { exact: true })).toHaveValue("Original note");
+  await expect(page.getByLabel("Note", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Close", exact: true }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await context.close();

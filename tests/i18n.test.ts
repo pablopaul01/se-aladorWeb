@@ -6,7 +6,7 @@ import { AuthSessionMissingError, type User, type UserResponse } from "@supabase
 import { bookCount, normalizeLocale, resolveLocale, translate } from "../src/lib/i18n/core";
 import { es } from "../src/lib/i18n/messages";
 import { persistAccountLocale } from "../src/lib/i18n/account";
-import { bookDetailsSchema, credentialsSchema, locationSchema, registrationSchema } from "../src/lib/validation";
+import { bookDetailsSchema, credentialsSchema, locationSchema, noteSchema, registrationSchema } from "../src/lib/validation";
 
 test("Spanish is the default, not the browser language", () => {
   for (const invalid of [null, undefined, "fr", "EN", "", {}, 1]) assert.equal(normalizeLocale(invalid), "es");
@@ -46,7 +46,7 @@ test("all explicit UI, action, and validation message keys have translations", (
       if (match[1]) assert.ok(match[1] in es, `${file}: ${match[1]}`);
     }
   }
-  for (const schema of [bookDetailsSchema, credentialsSchema, locationSchema, registrationSchema]) {
+  for (const schema of [bookDetailsSchema, credentialsSchema, locationSchema, noteSchema, registrationSchema]) {
     for (const input of [{}, { title: "", total_pages: "1.2", email: "bad", password: "", confirm_password: "different" }, { title: "x", author: "a".repeat(201), current_section: "x".repeat(201), note: "x".repeat(2001) }]) {
       const result = schema.safeParse(input);
       if (!result.success) for (const issue of result.error.issues) assert.notEqual(translate("es", issue.message), issue.message);

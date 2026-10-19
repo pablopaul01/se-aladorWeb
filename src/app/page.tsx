@@ -16,8 +16,10 @@ async function HomeContent() {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) redirect("/login");
 
-  const { data: books, error } = await supabase.from("books")
-    .select("*").eq("user_id", user.id).order("updated_at", { ascending: false });
+  const [{ data: books, error }, { data: notes, error: notesError }] = await Promise.all([
+    supabase.from("books").select("*").eq("user_id", user.id).order("updated_at", { ascending: false }),
+    supabase.from("book_notes").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).order("id"),
+  ]);
 
-  return <Library books={books ?? []} email={user.email ?? null} configured loadError={Boolean(error)} />;
+  return <Library books={books ?? []} notes={notes ?? []} notesLoadError={Boolean(notesError)} email={user.email ?? null} configured loadError={Boolean(error)} />;
 }
